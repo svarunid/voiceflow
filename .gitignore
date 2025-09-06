@@ -1,0 +1,95 @@
+# IDE / editor settings
+.vscode/
+
+# Python (apps/agent, apps/backend, etc.)
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments (uv or venv)
+.venv/
+venv/
+env/
+ENV/
+.python-version
+
+# uv / pip / build artifacts
+# Keep uv.lock committed; do not ignore it.
+# uv creates .venv by default which is ignored above.
+build/
+dist/
+wheels/
+pip-wheel-metadata/
+*.egg-info/
+.eggs/
+site/
+.python_modules/
+
+# Testing / coverage / type-checking
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+.mypy_cache/
+.pyre/
+.pytype/
+.ruff_cache/
+
+# PyInstaller
+*.manifest
+*.spec
+
+
+# Caches
+.cache/
+
+# JavaScript/TypeScript (apps/frontend, etc.)
+node_modules/
+
+# Build outputs
+dist/
+build/
+coverage/
+.cache/
+.tmp/
+
+# Framework-specific (add/remove as needed)
+.vite/
+vite.config.ts.timestamp-*
+
+# Env files (keep examples)
+.env
+.env.*
+!.env.example
+!.env.*.example
+
+# =========================
+# Docker
+# =========================
+# Compose/CLI env files often used for local overrides
+docker-compose.override.yml
+.docker/
+docker-data/
+# Reuse env rules above for Docker secrets/config
+# Avoid committing TLS keys/certs by default
+*.pem
+*.key
+*.crt
+
+# =========================
+# Monorepo / misc
+# =========================
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Archives
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.rar
+

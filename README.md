@@ -23,13 +23,12 @@ Outbound, human-like debt collection voice agent built with LiveKit (SIP + Rooms
 ```
 voice-flow/
 ├── apps/
-│   ├── backend/
+│   ├── python/
 │   │   ├── agent/
 │   │   ├── shared/
-│   │   ├── routers/
-│   │   ├── main.py
+│   │   ├── backend/
 │   │   ├── pyproject.toml
-│   └── frontend/
+│   └── web/
 │       ├── index.html
 │       ├── package.json
 │       ├── package-lock.json

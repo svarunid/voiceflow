@@ -11,13 +11,10 @@ Outbound, human-like debt collection voice agent built with LiveKit (SIP + Rooms
   - Python agent using LiveKit Agents with  Deepgram (STT) + Gemini (LLM) + Cartesia (TTS).
   - Tools for payment link, promise-to-pay logging, and fetching debt info.
 - Backend API:
-  - FastAPI for campaigns, calls, transcripts, outcomes, and simple risk scoring.
-  - Postgres for contacts, debts, attempts, transcripts, recordings, risk scores.
-- Recording & transcripts:
-  - LiveKit Egress (planned) for call recordings to S3/GCS.
-  - Realtime text turns streamed to backend and broadcast to UI.
+  - FastAPI for campaigns, calls, transcripts and outcomes.
+  - Postgres for contacts, debts and call attempts
 - Frontend:
-  - React (Vite) dashboard to kick off calls, watch live transcripts, and view recordings and scores.
+  - React (Vite) dashboard to manage contacts, intiate calls, etc.
 
 ## Repository layout
 ```

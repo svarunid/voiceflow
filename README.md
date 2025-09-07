@@ -70,19 +70,19 @@ cd voice-flow
 
 Install the dependencies
 ```bash
-cd apps/backend
+cd apps/python
 uv sync --all-packages
 ```
 
 Run the agent in production mode
 Run the fastAPI server 
 ```bash
-uv run --package voice-flow-agent agent/main.py start
+uv run --package voice-flow-agent agent/src/voice_flow_agent/agent.py start
 ```
 
 Start the fastapi server
 ```bash
-uv run uvicorn main:app --port 8080
+uv run --package voice-flow-backend uvicorn backend.src.voice_flow_backed.main:app --port 8080
 ```
 
 ### 3. Frontend setup (React + Vite)

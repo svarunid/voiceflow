@@ -2,12 +2,19 @@
 name = "voice-flow-agent"
 version = "0.1.0"
 description = "Voice Flow outbound voice agent."
-readme = "../../README.md"
 requires-python = ">=3.13"
 dependencies = [
     "livekit-agents[cartesia,deepgram,google,silero,turn-detector]>=1.2.8",
     "livekit-plugins-noise-cancellation>=0.2.5",
-    "psycopg[binary]>=3.2.9",
+    "psycopg[c]>=3.2.9",
     "python-dotenv>=1.1.1",
     "sqlalchemy>=2.0.43",
+    "voice-flow-shared",
 ]
+
+[tool.uv.sources]
+voice-flow-shared = { workspace = true }
+
+[build-system]
+requires = ["uv_build>=0.8.15,<0.9.0"]
+build-backend = "uv_build"

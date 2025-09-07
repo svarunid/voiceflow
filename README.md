@@ -22,31 +22,30 @@ Outbound, human-like debt collection voice agent built with LiveKit (SIP + Rooms
 ## Repository layout
 ```
 voice-flow/
-├── apps
-│   ├── agent
+├── apps/
+│   ├── backend/
+│   │   ├── agent/
+│   │   ├── shared/
+│   │   ├── routers/
 │   │   ├── main.py
 │   │   ├── pyproject.toml
-│   │   └── uv.lock
-│   ├── backend
-│   │   ├── db.py
-│   │   ├── main.py
-│   │   ├── models.py
-│   │   ├── pyproject.toml
-│   │   ├── routers
-│   │   │   ├── calls.py
-│   │   │   ├── campaigns.py
-│   │   │   ├── health.py
-│   │   │   └── transcripts.py
-│   │   └── uv.lock
-│   └── frontend
-│       └── package.json
-├── infra
-│   ├── docker
-│   │   ├── agent.Dockerfile
-│   │   ├── backend.Dockerfile
-│   │   ├── docker-compose.yml
-│   │   └── frontend.Dockerfile
-│   └── scripts
+│   └── frontend/
+│       ├── index.html
+│       ├── package.json
+│       ├── package-lock.json
+│       ├── README.md
+│       ├── src/
+│       │   ├── components/
+│       │   ├── pages/
+│       │   ├── types/
+│       │   ├── utils/
+│       │   ├── App.tsx
+│       │   ├── main.tsx
+│       │   ├── index.css
+│       │   └── vite-env.d.ts
+│       ├── tsconfig.json
+│       ├── tsconfig.node.json
+│       └── vite.config.mts
 └── README.md
 ```
 
@@ -67,51 +66,30 @@ git clone <repo> voice-flow
 cd voice-flow
 ```
 
-### 2. Backend setup (FastAPI)
+### 2. Backend + Agent setup (FastAPI + LiveKit)
 
+Install the dependencies
 ```bash
 cd apps/backend
-uv sync
-# Ensure .env.local has necessary secrets configured.
-uv run uvicorn main:app --host 0.0.0.0 --port 8080 --reload
+uv sync --all-packages
 ```
 
-Notes:
-- On first start, the app auto-creates tables via SQLAlchemy metadata (dev only).
-- API base: http://localhost:8080
-
-### 3. Agent setup (LiveKit + Twilio)
-
+Run the agent in production mode
+Run the fastAPI server 
 ```bash
-cd apps/agent
-uv sync
-# Ensure .env.local has necessary secrets configured.
-uv run main.py
+uv run --package voice-flow-agent agent/main.py start
 ```
 
-### 4. Frontend setup (React + Vite)
+Start the fastapi server
+```bash
+uv run uvicorn main:app --port 8080
+```
 
+### 3. Frontend setup (React + Vite)
+
+Serve the frontend in development mode
 ```bash
 cd apps/frontend
-npm ci
-npm run dev -- --host
+npm i
+npm run dev
 ```
-
-Notes:
-- UI on http://localhost:5173
-
-### 5. Optional: Docker Compose
-
-Start the whole stack (Postgres, backend, agent, frontend) via compose:
-
-```bash
-make dev
-# or
-docker compose -f infra/docker/docker-compose.yml up --build
-```
-
-Services:
-- Postgres: 5432
-- Backend: 8080
-- Agent: 9090 (internal)
-- Frontend: 5173

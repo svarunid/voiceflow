@@ -7,11 +7,8 @@ from pydantic import BaseModel
 from sqlalchemy import select, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 
-import sys
-import os
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', '..'))
-from shared.db import get_db
-from shared.models import Contact, Debt
+from voice_flow_shared.db import get_db
+from voice_flow_shared.models import Contact, Debt, CallAttempt
 
 logger = logging.getLogger(__name__)
 
@@ -42,6 +39,17 @@ class DebtResponse(BaseModel):
         from_attributes = True
 
 
+class CallAttemptResponse(BaseModel):
+    attempt_id: int
+    contact_id: int
+    started_at: datetime
+    status: str
+    lk_room_name: Optional[str] = None
+
+    class Config:
+        from_attributes = True
+
+
 class ContactResponse(BaseModel):
     contact_id: int
     full_name: str
@@ -53,11 +61,23 @@ class ContactResponse(BaseModel):
         from_attributes = True
 
 
+class ContactDetailResponse(BaseModel):
+    contact_id: int
+    full_name: str
+    phone_number: str
+    language: str
+    debt: Optional[DebtResponse] = None
+    call_attempts: List[CallAttemptResponse] = []
+
+    class Config:
+        from_attributes = True
+
+
 class ContactDelete(BaseModel):
     contact_ids: List[int]
 
 
-@router.post("/contacts", response_model=ContactResponse, status_code=201)
+@router.post("/", response_model=ContactResponse, status_code=201)
 async def create_contact(
     contact_data: ContactCreate, db: AsyncSession = Depends(get_db)
 ):
@@ -131,7 +151,7 @@ async def create_contact(
         raise HTTPException(status_code=500, detail="Internal server error")
 
 
-@router.delete("/contacts")
+@router.delete("/")
 async def delete_contacts(
     contact_delete: ContactDelete, db: AsyncSession = Depends(get_db)
 ):
@@ -169,7 +189,69 @@ async def delete_contacts(
         raise HTTPException(status_code=500, detail="Internal server error")
 
 
-@router.get("/contacts", response_model=List[ContactResponse])
+@router.get("/search", response_model=List[ContactResponse])
+async def search_contacts(
+    q: str, skip: int = 0, limit: int = 100, db: AsyncSession = Depends(get_db)
+):
+    """Search contacts by name or phone number (partial matching)"""
+    try:
+        from sqlalchemy import or_, func
+
+        # Build search query with partial matching for both name and phone number
+        search_query = (
+            select(Contact)
+            .where(
+                or_(
+                    func.lower(Contact.full_name).contains(func.lower(q)),
+                    Contact.phone_number.contains(q),
+                )
+            )
+            .offset(skip)
+            .limit(limit)
+        )
+
+        contact_result = await db.execute(search_query)
+        contacts = contact_result.scalars().all()
+
+        # Get debts for all found contacts
+        contact_ids = [contact.contact_id for contact in contacts]
+        debt_result = await db.execute(
+            select(Debt).where(Debt.contact_id.in_(contact_ids))
+        )
+        debts = debt_result.scalars().all()
+
+        # Create a mapping of contact_id to debt
+        debt_map = {debt.contact_id: debt for debt in debts}
+
+        # Prepare response list
+        response_list = []
+        for contact in contacts:
+            response_data = {
+                "contact_id": contact.contact_id,
+                "full_name": contact.full_name,
+                "phone_number": contact.phone_number,
+                "language": contact.language,
+            }
+
+            debt = debt_map.get(contact.contact_id)
+            if debt:
+                response_data["debt"] = {
+                    "debt_id": debt.debt_id,
+                    "amount_due": debt.amount_due,
+                    "due_date": debt.due_date,
+                    "status": debt.status,
+                }
+
+            response_list.append(ContactResponse(**response_data))
+
+        return response_list
+
+    except Exception as e:
+        logger.error(f"Error searching contacts with query '{q}': {e}")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+
+@router.get("/", response_model=List[ContactResponse])
 async def list_contacts(
     skip: int = 0, limit: int = 100, db: AsyncSession = Depends(get_db)
 ):
@@ -217,9 +299,9 @@ async def list_contacts(
         raise HTTPException(status_code=500, detail="Internal server error")
 
 
-@router.get("/contacts/{contact_id}", response_model=ContactResponse)
+@router.get("/{contact_id}", response_model=ContactDetailResponse)
 async def get_contact(contact_id: int, db: AsyncSession = Depends(get_db)):
-    """Get a single contact by ID with debt information"""
+    """Get a single contact by ID with debt information and all call attempts"""
     try:
         # Get contact
         contact_result = await db.execute(
@@ -236,12 +318,30 @@ async def get_contact(contact_id: int, db: AsyncSession = Depends(get_db)):
         )
         debt = debt_result.scalar_one_or_none()
 
+        # Get all call attempts for this contact
+        call_attempts_result = await db.execute(
+            select(CallAttempt)
+            .where(CallAttempt.contact_id == contact_id)
+            .order_by(CallAttempt.started_at.desc())
+        )
+        call_attempts = call_attempts_result.scalars().all()
+
         # Prepare response
         response_data = {
             "contact_id": contact.contact_id,
             "full_name": contact.full_name,
             "phone_number": contact.phone_number,
             "language": contact.language,
+            "call_attempts": [
+                {
+                    "attempt_id": attempt.attempt_id,
+                    "contact_id": attempt.contact_id,
+                    "started_at": attempt.started_at,
+                    "status": attempt.status,
+                    "lk_room_name": attempt.lk_room_name,
+                }
+                for attempt in call_attempts
+            ],
         }
 
         if debt:
@@ -252,7 +352,7 @@ async def get_contact(contact_id: int, db: AsyncSession = Depends(get_db)):
                 "status": debt.status,
             }
 
-        return ContactResponse(**response_data)
+        return ContactDetailResponse(**response_data)
 
     except HTTPException:
         raise

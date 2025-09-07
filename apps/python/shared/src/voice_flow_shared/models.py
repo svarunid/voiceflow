@@ -4,7 +4,6 @@ from sqlalchemy import (
     String,
     DateTime,
     ForeignKey,
-    JSON,
     Enum,
     Text,
 )
@@ -50,42 +49,12 @@ class CallAttempt(Base):
     lk_room_name: Mapped[str | None] = mapped_column(String(128))
 
 
-# class Transcript(Base):
-#     __tablename__ = "transcripts"
-#     turn_id: Mapped[int] = mapped_column(Integer, primary_key=True)
-#     attempt_id: Mapped[int] = mapped_column(ForeignKey("call_attempts.attempt_id"))
-#     ts: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
-#     speaker: Mapped[str] = mapped_column(String(16))  # "agent" | "customer"
-#     text: Mapped[str] = mapped_column(String)
-#     confidence: Mapped[float | None]
-
-
 class Outcome(Base):
     __tablename__ = "outcomes"
     attempt_id: Mapped[int] = mapped_column(
-        ForeignKey("call_attempts.attempt_id"), primary_key=True
+        ForeignKey("call_attempts.attempt_id", ondelete="CASCADE"), primary_key=True
     )
     resolution: Mapped[ResolutionType] = mapped_column(Enum(ResolutionType))
     description: Mapped[str] = mapped_column(Text)
     promise_amount: Mapped[int | None]
     promise_date: Mapped[datetime | None]
-
-
-# class Recording(Base):
-#     __tablename__ = "recordings"
-#     attempt_id: Mapped[int] = mapped_column(
-#         ForeignKey("call_attempts.attempt_id"), primary_key=True
-#     )
-#     egress_id: Mapped[str] = mapped_column(String(64))
-#     storage_url: Mapped[str] = mapped_column(String)
-#     duration_sec: Mapped[int | None]
-
-
-# class RiskScore(Base):
-#     __tablename__ = "risk_scores"
-#     attempt_id: Mapped[int] = mapped_column(
-#         ForeignKey("call_attempts.attempt_id"), primary_key=True
-#     )
-#     model_version: Mapped[str] = mapped_column(String(32))
-#     score: Mapped[float]
-#     features_json: Mapped[dict | None] = mapped_column(JSON)

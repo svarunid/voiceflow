@@ -1,0 +1,39 @@
+@import "tailwindcss";
+
+/* Custom styles that work with Tailwind */
+@layer components {
+  .status-started {
+    @apply bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-semibold;
+  }
+  
+  .status-dispatched {
+    @apply bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-semibold;
+  }
+  
+  .status-call_ended {
+    @apply bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-semibold;
+  }
+  
+  .status-failed {
+    @apply bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs font-semibold;
+  }
+  
+  .status-completed {
+    @apply bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-semibold;
+  }
+}
+
+/* Loading animation */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(59, 130, 246, 0.3);
+  border-radius: 50%;
+  border-top-color: #3b82f6;
+  animation: spin 1s ease-in-out infinite;
+}

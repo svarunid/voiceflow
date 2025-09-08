@@ -167,3 +167,5 @@ The platform integrates with several external services. You'll need accounts and
 1. Simulation of actual **voice interaction** between agent and generated defaulter persona isn't implemented since it isn't necessary for testing the conversational performance of the agent.
 2. Currently optimizing for only **two** metrics (politeness and negotiability) at present. Additional performance metrics could be added in the future.
 3. Since all the components of the testing system are primarily **LLMs**, the optimization that happens through them might **not** be entirely **reliable**. Hence the prompt versioning and pinning has to be done manually to choose the right prompts.
+
+In general the **codebase** might be slightly **less developer friendly** since only minimal code is documented.

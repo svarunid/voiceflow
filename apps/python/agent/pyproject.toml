@@ -10,6 +10,7 @@ dependencies = [
     "python-dotenv>=1.1.1",
     "sqlalchemy>=2.0.43",
     "voice-flow-shared",
+    "boto3>=1.34.0",
 ]
 
 [tool.uv.sources]

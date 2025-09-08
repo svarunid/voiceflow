@@ -1,0 +1,19 @@
+[project]
+name = "voice-flow-testing"
+version = "0.1.0"
+description = "Voice Flow's automated testing & self correction platform."
+requires-python = ">=3.13"
+dependencies = [
+  "fastapi>=0.111.0",
+  "uvicorn>=0.30.0",
+  "sqlalchemy>=2.0.30",
+  "google-genai>=1.33.0",
+  "voice_flow_shared",
+]
+
+[tool.uv.sources]
+voice-flow-shared = { workspace = true }
+
+[build-system]
+requires = ["uv_build>=0.8.15,<0.9.0"]
+build-backend = "uv_build"

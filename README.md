@@ -73,12 +73,12 @@ uv sync --all-packages
 Run the agent in production mode
 Run the fastAPI server 
 ```bash
-uv run --package voice-flow-agent agent/src/voice_flow_agent/agent.py start
+uv run --package voice-flow-agent agent/src/voice_flow_agent/main.py start
 ```
 
 Start the fastapi server
 ```bash
-uv run --package voice-flow-backend uvicorn backend.src.voice_flow_backed.main:app --port 8080
+uv run --package voice-flow-backend uvicorn backend.src.voice_flow_backend.main:app --port 8080
 ```
 
 ### 3. Frontend setup (React + Vite)

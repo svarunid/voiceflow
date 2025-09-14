@@ -52,25 +52,25 @@ async def entrypoint(ctx: agents.JobContext):
             )
         )
 
-    # # Recording call requires egress service to be configured locally.
-    # egress_request = api.RoomCompositeEgressRequest(
-    #     room_name=ctx.room.name,
-    #     audio_only=True,
-    #     file_outputs=[
-    #         api.EncodedFileOutput(
-    #             file_type=api.EncodedFileType.OGG,
-    #             filepath=f"{room.name}.ogg",
-    #             s3=api.S3Upload(
-    #                 bucket=f"{os.getenv('AWS_S3_BUCKET')}/recordings",
-    #                 region=os.getenv("AWS_REGION"),
-    #                 access_key=os.getenv("AWS_ACCESS_KEY_ID"),
-    #                 secret=os.getenv("AWS_SECRET_ACCESS_KEY"),
-    #             ),
-    #         )
-    #     ],
-    # )
+    # Recording call requires egress service to be configured locally.
+    egress_request = api.RoomCompositeEgressRequest(
+        room_name=ctx.room.name,
+        audio_only=True,
+        file_outputs=[
+            api.EncodedFileOutput(
+                file_type=api.EncodedFileType.OGG,
+                filepath=f"recordings/{room.name}.ogg",
+                s3=api.S3Upload(
+                    bucket=f"{os.getenv('AWS_S3_BUCKET')}",
+                    region=os.getenv("AWS_REGION"),
+                    access_key=os.getenv("AWS_ACCESS_KEY_ID"),
+                    secret=os.getenv("AWS_SECRET_ACCESS_KEY"),
+                ),
+            )
+        ],
+    )
 
-    # await ctx.api.egress.start_room_composite_egress(egress_request)
+    await ctx.api.egress.start_room_composite_egress(egress_request)
 
     session = agents.AgentSession(
         stt=deepgram.STT(model="nova-3"),
